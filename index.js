@@ -7,7 +7,8 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the public directory
+app.use('/node_modules', express.static('node_modules'));
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from public directory
 
 // Routes
 app.use(todoRoutes);
@@ -19,7 +20,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 4000; // todo port number .env file
+const PORT = process.env.PORT || 4000; // todo .env file
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

@@ -308,7 +308,14 @@ class TodoApp extends LitElement {
     // Display tasks
     displayTasks() {
         fetch('/tasks')
-        .then(response => response.json())
+        // .then(response => response.json())
+        .then(response => {
+            console.log('Response:', response);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(tasks => {
             this.tasks = tasks;
         })

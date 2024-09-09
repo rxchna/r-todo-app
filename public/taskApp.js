@@ -4,19 +4,19 @@ class TodoApp extends LitElement {
 	
     static properties = {
         tasks: { type: Array },
-        isEditing: { type: Boolean },
+        isEditing: { type: Number },
         editTaskId: { type: String }
     };
 
     constructor() {
         super();
         this.tasks = [];
-        this.isEditing = false;
+        this.isEditing = 0;
         this.editTaskId = '';
     }
 
     static styles = css`
-        body {
+    :host {
         font-family: Arial, sans-serif;
         padding: 20px;
         background-color: #f5f5f5;
@@ -83,7 +83,7 @@ class TodoApp extends LitElement {
 
     .table-container {
         max-height: 33em;
-        overflow-x: auto;  /* Enable horizontal scrolling */
+        overflow-x: auto;
         display: block;
         margin-top: 20px;
         border: solid 1px black;
@@ -237,32 +237,33 @@ class TodoApp extends LitElement {
         return html`
         <main>
             <div class="main-body">
-            <div class="my-tasks-data">
-                <h1 class="my-tasks-header">🚀 TaskTrack ✅</h1>
-                <button @click="${this.showAddForm}">New Task</button>
-                <input type="search" class="filter-input-field" placeholder="Filter by keyword..." @input="${this.filterTasks}">
-                <div class="table-container">
-                <table id="tasksTable">
-                    <thead>
-                    <tr>
-                        <th class="header-title">Title</th>
-                        <th class="header-desc">Description</th>
-                        <th class="header-assignedto">Assigned To</th>
-                        <th class="header-duedate">Due Date</th>
-                        <th class="header-priority">Priority</th>
-                        <th class="header-status">Status</th>
-                        <th class="header-actions">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    ${this.tasks.length
-                        ? this.tasks.map(task => this.createTaskRow(task))
-                        : html`<tr><td colspan="7" class="alert-no-task">No tasks available. Add a new one!</td></tr>`}
-                    </tbody>
-                </table>
+                <div class="my-tasks-data">
+                    <h1 class="my-tasks-header">🚀 TaskTrack: Master Your To-Dos ✅</h1>
+                    <button id="new-task-button" @click="${this.showAddForm}">New Task</button>
+                    <input type="search" class="filter-input-field" placeholder="Filter by keyword..." @input="${this.filterTasks}">
+                    <div class="table-container">
+                        <table id="tasksTable">
+                            <thead>
+                                <tr>
+                                    <th class="header-title">Title</th>
+                                    <th class="header-desc">Description</th>
+                                    <th class="header-assignedto">Assigned To</th>
+                                    <th class="header-duedate">Due Date</th>
+                                    <th class="header-priority">Priority</th>
+                                    <th class="header-status">Status</th>
+                                    <th class="header-actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${this.tasks.length
+                                    ? this.tasks.map(task => this.createTaskRow(task))
+                                    : html`<tr><td colspan="7" class="alert-no-task">No tasks available. Add a new one!</td></tr>`
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            ${this.renderForm()}
+                ${this.isEditing != 0 ? this.renderForm() : ''}
             </div>
         </main>
         `;
@@ -271,51 +272,49 @@ class TodoApp extends LitElement {
     renderForm() {
         return html`
         <div class="new-task-form-container">
-            <h1>${this.isEditing ? 'Edit Task' : 'New Task'}</h1>
-            <form @submit="${this.isEditing ? this.saveEditedTask : this.addTask}">
-            <label for="title">Title</label><span class="message"></span><br>
-            <input type="text" id="title" name="title"><br>
+            <h1>${this.isEditing == 1 ? 'New Task' : 'Edit Task'}</h1>
+            <form @submit="${this.isEditing == 1 ? this.addTask : this.saveEditedTask}">
+                <label for="title">Title</label><span class="message"></span><br>
+                <input type="text" id="title" name="title"><br>
 
-            <label for="description">Task Description</label><span class="message"></span><br>
-            <textarea id="description" rows="3" cols="50"></textarea><br>
-            
-            <label for="assignedTo">Assigned To</label><span class="message"></span><br>
-            <input type="text" id="assignedTo"><br>
-            
-            <label for="dueDate">Due Date</label><span class="message"></span><br>
-            <input type="date" id="dueDate"><br>
-            
-            <label for="priority">Priority</label><span class="message"></span><br>
-            <select id="priority">
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-            </select><br>
-            
-            <label for="status">Status</label><span class="message"></span><br>
-            <select id="status">
-                <option value="Pending">Pending</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-            </select><br>
-            
-            <button type="submit">${this.isEditing ? 'Save' : 'Add'}</button>
+                <label for="description">Task Description</label><span class="message"></span><br>
+                <textarea id="description" rows="3" cols="50"></textarea><br>
+                
+                <label for="assignedTo">Assigned To</label><span class="message"></span><br>
+                <input type="text" id="assignedTo"><br>
+                
+                <label for="dueDate">Due Date</label><span class="message"></span><br>
+                <input type="date" id="dueDate"><br>
+                
+                <label for="priority">Priority</label><span class="message"></span><br>
+                <select id="priority">
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select><br>
+                
+                <label for="status">Status</label><span class="message"></span><br>
+                <select id="status">
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select><br>
+                
+                <button type="submit">${this.isEditing == 1 ? 'Add' : 'Save'}</button>
             </form>
         </div>
         `;
     }
 
+    // Show new task form
+    showAddForm() {
+        this.isEditing = 1;
+    }
+
     // Display tasks
     displayTasks() {
         fetch('/tasks')
-        // .then(response => response.json())
-        .then(response => {
-            console.log('Response:', response);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(tasks => {
             this.tasks = tasks;
         })
@@ -329,14 +328,14 @@ class TodoApp extends LitElement {
         const newTask = this.getFormValues();
 
         if (this.validateFormData(newTask)) {
-        fetch('/tasks', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newTask)
-        })
+            fetch('/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newTask)
+            })
             .then(() => {
-            this.displayTasks();
-            this.hideForm();
+                this.displayTasks();
+                this.isEditing = 0;
             })
             .catch(err => console.error('Error:', err));
         }
@@ -350,15 +349,14 @@ class TodoApp extends LitElement {
         const editedTask = this.getFormValues();
 
         if (this.validateFormData(editedTask)) {
-        fetch(`/tasks/${taskId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(editedTask)
-        })
+            fetch(`/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editedTask)
+            })
             .then(() => {
-            this.displayTasks();
-            this.hideForm();
-            this.isEditing = false;
+                this.displayTasks();
+                this.isEditing = 0;
             })
             .catch(err => console.error('Error:', err));
         }
@@ -372,16 +370,29 @@ class TodoApp extends LitElement {
     }
 
     // Function to handle editing a task
-    editTask(taskId) {
-        fetch(`/tasks/${taskId}`)
-        .then(response => response.json())
-        .then(task => {
-            this.isEditing = true;
+    async editTask(taskId) {
+        try {
+            // Fetch the task data
+            const response = await fetch(`/tasks/${taskId}`);
+            
+            // Convert the response to JSON
+            const task = await response.json();
+            
+            // Set editing state
+            this.isEditing = 2;
             this.editTaskId = taskId;
+            
+            // Await the DOM update before accessing form elements
+            await this.requestUpdate();
+    
+            // Populate the form with task data
             this.populateForm(task);
-        })
-        .catch(err => alert('Task not found!'));
-    }
+    
+        } catch (err) {
+            // Handle errors such as task not found
+            alert('Task not found!');
+        }
+    }    
 
     // Filtering tasks by search text
     filterTasks(event) {
@@ -391,12 +402,12 @@ class TodoApp extends LitElement {
         .then(response => response.json())
         .then(tasks => {
             const filteredTasks = tasks.filter(task =>
-            task.title.toLowerCase().includes(searchText) ||
-            task.description.toLowerCase().includes(searchText) ||
-            task.assignedTo.toLowerCase().includes(searchText) ||
-            task.dueDate.toLowerCase().includes(searchText) ||
-            task.priority.toLowerCase().includes(searchText) ||
-            task.status.toLowerCase().includes(searchText)
+                task.title.toLowerCase().includes(searchText) ||
+                task.description.toLowerCase().includes(searchText) ||
+                task.assignedTo.toLowerCase().includes(searchText) ||
+                task.dueDate.toLowerCase().includes(searchText) ||
+                task.priority.toLowerCase().includes(searchText) ||
+                task.status.toLowerCase().includes(searchText)
             );
             this.tasks = filteredTasks;
         })
@@ -405,29 +416,24 @@ class TodoApp extends LitElement {
 
     getFormValues() {
         return {
-        title: this.shadowRoot.getElementById('title').value,
-        description: this.shadowRoot.getElementById('description').value,
-        assignedTo: this.shadowRoot.getElementById('assignedTo').value,
-        dueDate: this.shadowRoot.getElementById('dueDate').value,
-        priority: this.shadowRoot.getElementById('priority').value,
-        status: this.shadowRoot.getElementById('status').value
+            title: this.shadowRoot.getElementById('title').value,
+            description: this.shadowRoot.getElementById('description').value,
+            assignedTo: this.shadowRoot.getElementById('assignedTo').value,
+            dueDate: this.shadowRoot.getElementById('dueDate').value,
+            priority: this.shadowRoot.getElementById('priority').value,
+            status: this.shadowRoot.getElementById('status').value
         };
     }
 
     validateFormData(task) {
         const requiredFields = ['title', 'description', 'assignedTo', 'dueDate', 'priority', 'status'];
         for (const field of requiredFields) {
-        if (!task[field]) {
-            alert(`Please enter a valid ${field}`);
-            return false;
-        }
+            if (!task[field]) {
+                alert(`Please enter a valid ${field}`);
+                return false;
+            }
         }
         return true;
-    }
-
-    hideForm() {
-        this.shadowRoot.getElementById('taskForm').reset();
-        this.isEditing = false;
     }
 
     populateForm(task) {
@@ -449,8 +455,8 @@ class TodoApp extends LitElement {
             <td data-priority="${task.priority}">${task.priority}</td>
             <td>${task.status}</td>
             <td class="actions-list">
-            <button @click="${() => this.editTask(task.id)}">Edit</button>
-            <button @click="${() => this.deleteTask(task.id)}">Delete</button>
+                <button class="edit-task-button" @click="${() => this.editTask(task.id)}">Edit</button>
+                <button class="delete-task-button" @click="${() => this.deleteTask(task.id)}">Delete</button>
             </td>
         </tr>
         `;

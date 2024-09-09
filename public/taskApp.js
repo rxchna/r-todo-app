@@ -17,6 +17,7 @@ class TodoApp extends LitElement {
 
     static styles = css`
     :host {
+        display: block;
         font-family: Arial, sans-serif;
         padding: 20px;
         background-color: #f5f5f5;
@@ -198,6 +199,14 @@ class TodoApp extends LitElement {
         margin-left: 1em;
     }
 
+    .even-row {
+        background-color: #f9f9f9; /* Light gray for even rows */
+    }
+
+    .odd-row {
+        background-color: #ffffff; /* White for odd rows */
+    }
+
     @media all and (max-width: 1500px) {
         .main-body {
             grid-template-columns: 1fr;
@@ -256,7 +265,7 @@ class TodoApp extends LitElement {
                             </thead>
                             <tbody>
                                 ${this.tasks.length
-                                    ? this.tasks.map(task => this.createTaskRow(task))
+                                    ? this.tasks.map((task, index) => this.createTaskRow(task, index))
                                     : html`<tr><td colspan="7" class="alert-no-task">No tasks available. Add a new one!</td></tr>`
                                 }
                             </tbody>
@@ -308,6 +317,10 @@ class TodoApp extends LitElement {
 
     // Show new task form
     showAddForm() {
+        if (this.isEditing == 2) {
+            // Clear form
+            this.shadowRoot.querySelector('form').reset();
+        }
         this.isEditing = 1;
     }
 
@@ -445,9 +458,12 @@ class TodoApp extends LitElement {
         this.shadowRoot.getElementById('status').value = task.status;
     }
 
-    createTaskRow(task) {
+    createTaskRow(task, index) {
+        // Determine if the row is even or odd based on the index
+        const rowClass = index % 2 === 0 ? 'even-row' : 'odd-row';
+
         return html`
-        <tr>
+        <tr class="${rowClass}">
             <td>${task.title}</td>
             <td>${task.description}</td>
             <td>${task.assignedTo}</td>
